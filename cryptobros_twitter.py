@@ -8,8 +8,7 @@ import pandas as pd
 
 # Where to write the tweets data
 
-username = ''
-writeto = 'C:/Users/' + username + '/Documents/Data/cryptobros/data/'
+writeto = 'D:/cryptobros/data/'
 
 # Use nest_asyncio to permit asynchronous loops
 

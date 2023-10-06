@@ -9,12 +9,11 @@ import numpy as np
 
 # Where to write the tweets data
 
-username = ''
-writeto = 'C:/Users/' + username + '/Documents/Data/cryptobros/data/'
+writeto = 'D:/cryptobros/data/'
 
 # Read in the accounts data
 
-accounts_df = pd.read_csv('C:/Users/' + username + '/Documents/Data/cryptobros/data/accounts.csv')
+accounts_df = pd.read_csv(writeto + '/accounts.csv')
 
 # Randomly subset control accounts to match the treated groups in size
 

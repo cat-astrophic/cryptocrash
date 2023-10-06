@@ -12,8 +12,7 @@ from nrclex import NRCLex
 
 # Where to write the sentiment analysis outputs
 
-username = ''
-writeto = 'C:/Users/' + username + '/Documents/Data/cryptobros/data/'
+writeto = 'D:/cryptobros/data/'
 
 # Read in the tweets
 

@@ -6,12 +6,11 @@ import pandas as pd
 
 # Where to write the tweets data
 
-username = ''
-writeto = 'C:/Users/' + username + '/Documents/Data/cryptobros/data/'
+writeto = 'D:/cryptobros/data/'
 
 # Read in the data
 
-twitter_df = pd.read_csv('C:/Users/' + username + '/Documents/Data/cryptobros/data/raw_twitter_data.csv')
+twitter_df = pd.read_csv(writeto + 'raw_twitter_data.csv')
 
 # Subsetting the data based on potential treated or control status
 
