@@ -3,16 +3,21 @@
 # Importing required modules
 
 import pandas as pd
+import numpy as np
 import nltk
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
+nltk.download('vader_lexicon')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 from wordcloud import WordCloud
 from matplotlib import pyplot as plt
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.metrics import silhouette_score
+import scipy.cluster.hierarchy as shc
 
 # Where to write the sentiment analysis outputs
 
@@ -180,6 +185,9 @@ for t in clean_tweets_c:
 
 # Get unique words for each group
 
+t_unique = list(set(t_bag))
+c_unique = list(set(c_bag))
+
 t_unique = []
 c_unique = []
 
@@ -286,4 +294,132 @@ plt.figure()
 plt.imshow(wordcloud, interpolation = 'bilinear')
 plt.axis('off')
 plt.show()
+
+# Additional herding analysis - normalized term co-occurence to generate a feature similarity matrix and then cluster
+
+Mt = np.zeros((len(t_words_only),len(t_words_only)))
+Mc = np.zeros((len(c_words_only),len(c_words_only)))
+
+for i in range(len(t_words_only)-1):
+    
+    for j in range(i+1,len(t_words_only)):
+        
+        for t in clean_tweets_t:
+            
+            if (t_words_only[i] in t) and (t_words_only[j] in t):
+                
+                Mt[i,j] += 1
+
+for i in range(len(c_words_only)-1):
+    
+    for j in range(i+1,len(c_words_only)):
+        
+        for t in clean_tweets_c:
+            
+            if (c_words_only[i] in t) and (c_words_only[j] in t):
+                
+                Mc[i,j] += 1
+
+Mt = Mt + np.transpose(Mt)
+Mc = Mc + np.transpose(Mc)
+
+Mt = Mt / Mt.max()
+Mc = Mc / Mc.max()
+
+Mtx = np.sqrt(Mt)
+Mcx = np.sqrt(Mc)
+
+Mtxx = np.sqrt(Mtx)
+Mcxx = np.sqrt(Mcx)
+
+Mtxxx = np.sqrt(Mtxx)
+Mcxxx = np.sqrt(Mcxx)
+
+# Optimizing the number of clusters with silhouette scoring
+
+silhouettes_t = []
+silhouettes_c = []
+
+for i in range(2,16):
+    
+    t_cluster_model = AgglomerativeClustering(affinity = 'precomputed', n_clusters = i, linkage = 'complete').fit(Mt)
+    c_cluster_model = AgglomerativeClustering(affinity = 'precomputed', n_clusters = i, linkage = 'complete').fit(Mc)
+    
+    silhouettes_t.append(silhouette_score(Mt, t_cluster_model.fit_predict(Mt)))
+    silhouettes_c.append(silhouette_score(Mc, c_cluster_model.fit_predict(Mc)))
+
+
+silhouettes_tx = []
+silhouettes_cx = []
+
+# Optimizing the number of clusters with hierarchical clustering for all available methods
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'single')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'complete')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'average')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'weighted')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'centroid')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'median')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'ward')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Control Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'single')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'complete')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'average')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'weighted')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'centroid')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'median')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'ward')), orientation = 'left')
+
+# Extracting results from the hierarchical clustering method using the Ward method
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+t_Dendrogram = shc.dendrogram((shc.linkage(Mtxxx, method = 'average')), orientation = 'left')
+
+plt.figure(figsize = (8, 8))
+plt.title('Hierarchical Clustering Analysis Results - Treated Group')
+c_Dendrogram = shc.dendrogram((shc.linkage(Mcxxx, method = 'average')), orientation = 'left')
+
+t_clu_res = pd.concat([pd.Series(t_Dendrogram['leaves'], name = 'ID'), pd.Series([t_words_only[i] for i in t_Dendrogram['leaves']], name = 'Word'), pd.Series(t_Dendrogram['leaves_color_list'], name = 'Cluster')], axis = 1)
+c_clu_res = pd.concat([pd.Series(c_Dendrogram['leaves'], name = 'ID'), pd.Series([c_words_only[i] for i in c_Dendrogram['leaves']], name = 'Word'), pd.Series(c_Dendrogram['leaves_color_list'], name = 'Cluster')], axis = 1)
 
